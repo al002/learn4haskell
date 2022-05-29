@@ -514,6 +514,40 @@ After defining the city, implement the following functions:
    and at least 10 living __people__ inside in all houses of the city in total.
 -}
 
+data Castle = MkCastle
+  {
+
+  }
+
+data Wall = MkWall
+  {
+
+  }
+
+data Church = MkChurch
+  {
+
+  }
+
+data Library = MkLibrary
+  {
+
+  }
+
+data House = MkHouse
+  {
+
+  }
+
+data City = MkCity
+  {
+    cityCastle :: Castle,
+    cityWall :: Wall,
+    cityChurch :: Church,
+    cityLibrary :: Library,
+    cityHouses :: [House]
+  }
+
 {-
 =🛡= Newtypes
 
