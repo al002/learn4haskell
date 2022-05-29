@@ -343,6 +343,12 @@ Define the Book product data type. You can take inspiration from our description
 of a book, but you are not limited only by the book properties we described.
 Create your own book type of your dreams!
 -}
+data Book = MkBook
+  {
+    bookName :: String,
+    bookAuthor :: String,
+    bookPages :: Int
+  }
 
 {- |
 =⚔️= Task 2
@@ -375,6 +381,30 @@ after the fight. The battle has the following possible outcomes:
 ♫ NOTE: In this task, you need to implement only a single round of the fight.
 
 -}
+
+data Knight = MkKnight
+  {
+    knightHealth :: Int,
+    knightAttack :: Int,
+    knightGold :: Int
+  }
+
+data Monster = MkMonster
+  {
+    monsterHealth :: Int,
+    monsterAttack :: Int,
+    monsterGold :: Int
+  }
+
+
+fight :: Knight -> Monster -> Int
+fight k m
+   | monsterHealth m1 < 0 = knightGold k + monsterGold m
+   | knightHealth k1 < 0 = - 1
+   | otherwise = knightGold k
+   where
+     m1 = m { monsterHealth = monsterHealth m - knightAttack k }
+     k1 = k { knightHealth = knightHealth k - monsterAttack m }
 
 {- |
 =🛡= Sum types
@@ -461,6 +491,8 @@ and provide more flexibility when working with data types.
 Create a simple enumeration for the meal types (e.g. breakfast). The one who
 comes up with the most number of names wins the challenge. Use your creativity!
 -}
+
+data MealType = Breakfast | Lunch |Dinner
 
 {- |
 =⚔️= Task 4
