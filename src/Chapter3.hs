@@ -492,7 +492,7 @@ Create a simple enumeration for the meal types (e.g. breakfast). The one who
 comes up with the most number of names wins the challenge. Use your creativity!
 -}
 
-data MealType = Breakfast | Lunch |Dinner
+data MealType = Breakfast | Lunch | Dinner
 
 {- |
 =⚔️= Task 4
@@ -514,40 +514,47 @@ After defining the city, implement the following functions:
    and at least 10 living __people__ inside in all houses of the city in total.
 -}
 
-data Castle = MkCastle
-  {
+data Castle
+  = None
+  | OnlyCastle String
+  | CastleWithWalls String
 
-  }
+data House = One | Two | Three | Four
 
-data Wall = MkWall
-  {
-
-  }
-
-data Church = MkChurch
-  {
-
-  }
-
-data Library = MkLibrary
-  {
-
-  }
-
-data House = MkHouse
-  {
-
-  }
+data MainBuilding
+  = Church
+  | Library
 
 data City = MkCity
   {
     cityCastle :: Castle,
-    cityWall :: Wall,
-    cityChurch :: Church,
-    cityLibrary :: Library,
+    cityMainBuilding :: MainBuilding,
     cityHouses :: [House]
   }
 
+countPeopleInHouse :: House -> Int
+countPeopleInHouse house = case house of
+  One -> 1
+  Two -> 2
+  Three -> 3
+  Four -> 4
+
+buildCastle :: City -> String -> City
+buildCastle city castleName = case cityCastle city of
+  CastleWithWalls _ -> city { cityCastle = CastleWithWalls castleName }
+  _ -> city { cityCastle = OnlyCastle castleName }
+
+buildHouse :: House -> City -> City
+buildHouse h c = c { cityHouses = h : cityHouses c}
+
+buildWalls :: City -> City
+buildWalls c = case cityCastle c of
+  OnlyCastle castleName ->
+    if sum (map countPeopleInHouse (cityHouses c)) >= 10
+    then c { cityCastle = CastleWithWalls castleName }
+    else c
+  _ -> c
+  
 {-
 =🛡= Newtypes
 
@@ -628,19 +635,25 @@ introducing extra newtypes.
 🕯 HINT: if you complete this task properly, you don't need to change the
     implementation of the "hitPlayer" function at all!
 -}
+
+newtype PlayerArmor = MkPlayerArmor Int
+newtype PlayerAttack = MkPlayerAttack Int
+newtype PlayerDexterity = MkPlayerDexterity Int
+newtype PlayerStrength = MkPlayerStrength Int
+
 data Player = Player
     { playerHealth    :: Int
-    , playerArmor     :: Int
-    , playerAttack    :: Int
-    , playerDexterity :: Int
-    , playerStrength  :: Int
+    , playerArmor     :: PlayerArmor
+    , playerAttack    :: PlayerAttack
+    , playerDexterity :: PlayerDexterity
+    , playerStrength  :: PlayerStrength
     }
 
-calculatePlayerDamage :: Int -> Int -> Int
-calculatePlayerDamage attack strength = attack + strength
+calculatePlayerDamage :: PlayerAttack -> PlayerStrength -> Int
+calculatePlayerDamage (MkPlayerAttack attack) (MkPlayerStrength strength) = attack + strength
 
-calculatePlayerDefense :: Int -> Int -> Int
-calculatePlayerDefense armor dexterity = armor * dexterity
+calculatePlayerDefense :: PlayerArmor -> PlayerDexterity -> Int
+calculatePlayerDefense (MkPlayerArmor armor) (MkPlayerDexterity dexterity) = armor * dexterity
 
 calculatePlayerHit :: Int -> Int -> Int -> Int
 calculatePlayerHit damage defense health = health + defense - damage
@@ -821,6 +834,19 @@ parametrise data types in places where values can be of any general type.
   maybe-treasure ;)
 -}
 
+newtype Power a = MkPower a
+
+data TreasureChest x = TreasureChest
+  { treasureChestGold :: Int
+  , treasureChestLoot :: x
+  }
+
+data DragonLair p t = MkDragonLair
+  {
+    dragonLairDragonPower :: Power p
+  , dragonLairChest :: Maybe (TreasureChest t)
+  }
+
 {-
 =🛡= Typeclasses
 
@@ -975,9 +1001,25 @@ Implement instances of "Append" for the following types:
   ✧ *(Challenge): "Maybe" where append is appending of values inside "Just" constructors
 
 -}
+
 class Append a where
     append :: a -> a -> a
 
+newtype Gold = Gold Int
+
+instance Append Gold where
+  append :: Gold -> Gold -> Gold
+  append (Gold x) (Gold y) = Gold (x + y)
+
+instance Append [a] where
+  append :: [a] -> [a] -> [a] 
+  append = (++)
+
+instance Append a => Append (Maybe a) where
+  append :: Maybe a -> Maybe a -> Maybe a
+  append Nothing x = x
+  append x Nothing = x
+  append (Just x) (Just y) = Just (append x y)
 
 {-
 =🛡= Standard Typeclasses and Deriving
@@ -1038,6 +1080,26 @@ implement the following functions:
 
 🕯 HINT: to implement this task, derive some standard typeclasses
 -}
+
+data Week = 
+  Mon
+  | Tue
+  | Wed
+  | Thu
+  | Fri
+  | Sat
+  | Sun deriving (Show, Eq, Enum, Bounded)
+
+isWeekend :: Week -> Bool
+isWeekend w = w == Sat || w == Sun
+
+nextDay :: Week -> Week
+nextDay w
+  | w == maxBound = minBound
+  | otherwise = succ w
+
+daysToParty :: Week -> Int
+daysToParty w = (fromEnum Fri - fromEnum w) `mod` 7
 
 {-
 =💣= Task 9*
